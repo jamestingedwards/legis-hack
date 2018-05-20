@@ -6,15 +6,18 @@ We also have a [project website](https://jamestingedwards.github.io/legis-hack/)
 
 Install BeautifulSoup4 (pip install beautifulsoup4 / apt-get install python-bs4)
 
-Edit xmldownload.py to set variables `start_year` and `end_year`, to determine what legislation years are to be downloaded - xmldownload.py scrapes www.legislation.govt.nz/subscribe/ to download all xmls between start_year and end_year.
+Run `xmldownload.py`, setting the arguments `-s`/`--start_year` and `-e`/`--end_year`, to determine what legislation years are to be downloaded - xmldownload.py scrapes www.legislation.govt.nz/subscribe/ to download all xmls between `start_year` and `end_year`. 
+
+The `-v`/`--verbose` tag will tell `xmldownload.py` to print the progress to the console as the pages are scraped.
 
 ```
-$ python3 xmldownload.py
+$ python3 xmldownload.py -v --start_year 1993 --end_year 1993
 
 $ python3 xmltransform.py
 
 $ python3 adoccommitter.py
 ```
+
 adoccommitter.py runs a shell script that pushes after all commits, so you will need to authenticate to your git repo
 
 As a demonstration of output, repo/legislation/ currently lists all 1993 Acts with each amendment since then as a commit (view history of each file).

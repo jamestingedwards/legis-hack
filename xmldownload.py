@@ -2,9 +2,11 @@ from urllib.request import Request, urlopen, urlretrieve
 from bs4 import BeautifulSoup
 import re
 import os
+import sys, argparse
 import xml.dom.minidom
 
-def read_url(url, start_year, end_year, pretty_print):
+
+def read_url(url, start_year, end_year, verbose):
     url = url.replace(" ","%20")
     req = Request(url)
     a = urlopen(req).read()
@@ -27,11 +29,11 @@ def read_url(url, start_year, end_year, pretty_print):
         if match:
             #print("Group 1: " + match.group(1))
             year = int(match.group(1))
-            if year != None and year >= start_year and <= end_year:
+            if year != None and year >= start_year and year <= end_year:
                 #print('Going in to dir ' + dirUrl)
                 
                 #Recurse in to the directory
-                read_url(dirUrl, start_year, end_year, pretty_print)
+                read_url(dirUrl, start_year, end_year, verbose)
                 
     #absolute dir the script is in
     root_path = os.path.dirname(os.path.realpath(__file__))
@@ -68,7 +70,7 @@ def read_url(url, start_year, end_year, pretty_print):
                 title = version + '_' +  title
             
             #Make the xml pretty for easy reading in the file
-            if pretty_print:
+            if verbose:
                 xmlString = xml.dom.minidom.parseString(xmlString)
                 xmlString = xmlString.toprettyxml()
 
@@ -93,5 +95,24 @@ def read_url(url, start_year, end_year, pretty_print):
             file.write(xmlString.encode('ascii', 'ignore').decode('utf-8'))
             file.close()
             print("Downloaded to: " + file_path)
-        
-read_url("http://legislation.govt.nz/subscribe/act/public", 1993, 1993, False)
+
+if __name__ == "__main__":
+    
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-v", "--verbose", action = "store_true", 
+        help = "Pretty print status to console")
+    parser.add_argument("-s", "--start_year",
+        help = "Collect all legislation from after this year", 
+        required = True, type = int)
+    parser.add_argument("-e", "--end_year",
+        help = "Collect all legislation up until this year", 
+        required = True, type = int)
+
+    args = parser.parse_args()
+
+    read_url(
+        "http://legislation.govt.nz/subscribe/act/public", 
+        args.start_year, 
+        args.end_year, 
+        args.verbose)
